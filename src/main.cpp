@@ -5,8 +5,8 @@
 arduinoFFT FFT = arduinoFFT(); /* Create FFT object */
 
 #define CHANNEL A0
-const uint16_t samples = 1024;		   //This value MUST ALWAYS be a power of 2
-const double samplingFrequency = 952; //Hz, must be less than 10000 due to ADC
+const uint16_t samples = 256;		   //This value MUST ALWAYS be a power of 2
+const double samplingFrequency = 750; //Hz, must be less than 10000 due to ADC
 
 unsigned int sampling_period_us;
 unsigned long microseconds;
