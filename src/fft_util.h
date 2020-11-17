@@ -3,6 +3,13 @@
 #define SCL_FREQUENCY 0x02
 #define SCL_PLOT 0x03
 
+typedef struct fft_data
+{
+  double data[SAMPLING];
+  uint16_t size;
+}fft_data_t;
+
+
 void PrintVector(double *vData, uint16_t bufferSize, uint8_t scaleType)
 {
   for (uint16_t i = 0; i < bufferSize; i++)
@@ -25,25 +32,50 @@ void PrintVector(double *vData, uint16_t bufferSize, uint8_t scaleType)
     // if (scaleType == SCL_FREQUENCY)
       // Serial.print("Hz");
     // Serial.print(" ");
-    Serial.print(vData[i], 4);
-    Serial.print(','); 
+    Serial.println(vData[i], 4);
   }
   Serial.println();
 }
 
-void CalcFFT(double vR[], double vI[], uint8_t channel, unsigned int sampling, uint16_t samples)
+fft_data_t CalcFFT(double vR[], double vI[], uint8_t channel, unsigned int sampling, uint16_t samples)
 {
+  double data[samples], win[samples];
   /* Print the results of the sampling according to time */
-  Serial.println("Data:");
-  PrintVector(vReal, samples, SCL_TIME);
+  for (uint16_t i = 0; i < samples; i++)
+    data[i] = vR[i];
+  
+  // Serial.println("Data:");
+  // PrintVector(vR, samples, SCL_TIME);
   // ! Filtro FFT Hann para vibraciones
-  FFT.Windowing(vReal, samples, FFT_WIN_TYP_HANN, FFT_FORWARD);
-  Serial.println("Weighed data:");
-  PrintVector(vReal, samples, SCL_TIME);
-  FFT.Compute(vReal, vImag, samples, FFT_FORWARD); /* Compute FFT */
-  Serial.println("Computed Real values:");
-  PrintVector(vReal, samples, SCL_INDEX);
-  FFT.ComplexToMagnitude(vReal, vImag, samples); /* Compute magnitudes */
-  Serial.println("Computed magnitudes:");
-  PrintVector(vReal, (samples >> 1), SCL_FREQUENCY);
+  FFT.Windowing(vR, samples, FFT_WIN_TYP_HANN, FFT_FORWARD);
+  // Serial.println("Weighed data:");
+    for (uint16_t i = 0; i < samples; i++)
+      win[i] = vR[i];
+  // PrintVector(vR, samples, SCL_TIME);
+  FFT.Compute(vR, vImag, samples, FFT_FORWARD); /* Compute FFT */
+  // Serial.println("Computed Real values:");
+  // PrintVector(vR, samples, SCL_INDEX);
+  FFT.ComplexToMagnitude(vR, vImag, samples); /* Compute magnitudes */
+  // Serial.println("Computed magnitudes:");
+  // PrintVector(vR, (samples >> 1), SCL_FREQUENCY);
+  fft_data_t output;
+  for (uint16_t i = 0; i < (samples >> 1); i++)
+      output.data[i] = vR[i];
+
+  output.size = (samples >> 1);
+
+  return output;
+  /* for (uint16_t i = 0; i < samples; i++)
+  {
+    Serial.print(data[i]);
+    Serial.print(',');
+    Serial.print(win[i]);
+    Serial.print(',');
+    if (i < (samples >> 1))
+    {
+      Serial.print(vR[i]); 
+    }
+
+    Serial.println();
+  } */
 }

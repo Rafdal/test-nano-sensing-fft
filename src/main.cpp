@@ -5,8 +5,9 @@
 arduinoFFT FFT = arduinoFFT(); /* Create FFT object */
 
 #define CHANNEL A0
-const uint16_t samples = 256;		   //This value MUST ALWAYS be a power of 2
-const double samplingFrequency = 750; //Hz, must be less than 10000 due to ADC
+#define SAMPLING 256
+const uint16_t samples = SAMPLING;		   //This value MUST ALWAYS be a power of 2
+const double samplingFrequency = 900; //Hz, must be less than 10000 due to ADC
 
 unsigned int sampling_period_us;
 unsigned long microseconds;
@@ -20,6 +21,7 @@ double vImag[samples];
 
 #include "fft_util.h"
 #include "gyro_util.h"
+#include "sd_util.h"
 
 void setup()
 {
@@ -29,6 +31,7 @@ void setup()
 	Serial.println("Started");
 	delay(500);
 
+	sdSetup(4);
 	gyroSetup();
 	
 }
@@ -49,9 +52,9 @@ void loop()
 		microseconds += sampling_period_us;
 	}
 
-	CalcFFT(vReal, vImag, CHANNEL, sampling_period_us, samples);
+	fft_data_t data = CalcFFT(vReal, vImag, CHANNEL, sampling_period_us, samples);
 	
+	sdLog(data);
 			  /* Repeat after delay */
 	// imu_data_t gyro = readGyro();
-	delay(2000);
 }
