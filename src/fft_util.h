@@ -30,21 +30,8 @@ void PrintVector(double *vData, uint16_t bufferSize, uint8_t scaleType)
   Serial.println();
 }
 
-void CalcFFT(uint8_t channel, unsigned int sampling, uint16_t samples)
+void CalcFFT(double vR[], double vI[], uint8_t channel, unsigned int sampling, uint16_t samples)
 {
-    double vReal[samples];
-    double vImag[samples];
-	microseconds = micros();
-	for (int i = 0; i < samples; i++)
-	{
-		vReal[i] = analogRead(channel);
-		vImag[i] = 0;
-		while (micros() - microseconds < sampling_period_us)
-		{
-			//empty loop
-		}
-		microseconds += sampling_period_us;
-	}
 	/* Print the results of the sampling according to time */
 	Serial.println("Data:");
 	PrintVector(vReal, samples, SCL_TIME);
@@ -54,8 +41,6 @@ void CalcFFT(uint8_t channel, unsigned int sampling, uint16_t samples)
 	FFT.Compute(vReal, vImag, samples, FFT_FORWARD); /* Compute FFT */
 	Serial.println("Computed Real values:");
 	PrintVector(vReal, samples, SCL_INDEX);
-	Serial.println("Computed Imaginary values:");
-	PrintVector(vImag, samples, SCL_INDEX);
 	FFT.ComplexToMagnitude(vReal, vImag, samples); /* Compute magnitudes */
 	Serial.println("Computed magnitudes:");
 	PrintVector(vReal, (samples >> 1), SCL_FREQUENCY);
