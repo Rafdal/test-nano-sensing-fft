@@ -14,6 +14,8 @@
         "string_view": "cpp",
         "initializer_list": "cpp",
         "*.tcc": "cpp",
-        "fstream": "cpp"
+        "fstream": "cpp",
+        "mstd_iterator": "cpp",
+        "utility": "cpp"
     }
 }

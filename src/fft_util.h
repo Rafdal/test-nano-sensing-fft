@@ -3,6 +3,8 @@
 #define SCL_FREQUENCY 0x02
 #define SCL_PLOT 0x03
 
+#include <arduinoFFT.h>
+
 typedef struct fft_data
 {
   double data[SAMPLING];
@@ -37,7 +39,7 @@ void PrintVector(double *vData, uint16_t bufferSize, uint8_t scaleType)
   Serial.println();
 }
 
-fft_data_t CalcFFT(double vR[], double vI[], uint8_t channel, unsigned int sampling, uint16_t samples)
+fft_data_t CalcFFT(double vR[], double vI[], uint16_t samples)
 {
   double data[samples], win[samples];
   /* Print the results of the sampling according to time */
@@ -49,13 +51,15 @@ fft_data_t CalcFFT(double vR[], double vI[], uint8_t channel, unsigned int sampl
   // ! Filtro FFT Hann para vibraciones
   FFT.Windowing(vR, samples, FFT_WIN_TYP_HANN, FFT_FORWARD);
   // Serial.println("Weighed data:");
-    for (uint16_t i = 0; i < samples; i++)
-      win[i] = vR[i];
+  for (uint16_t i = 0; i < samples; i++)
+  {
+    win[i] = vR[i];
+  }
   // PrintVector(vR, samples, SCL_TIME);
-  FFT.Compute(vR, vImag, samples, FFT_FORWARD); /* Compute FFT */
+  FFT.Compute(vR, vI, samples, FFT_FORWARD); /* Compute FFT */
   // Serial.println("Computed Real values:");
   // PrintVector(vR, samples, SCL_INDEX);
-  FFT.ComplexToMagnitude(vR, vImag, samples); /* Compute magnitudes */
+  FFT.ComplexToMagnitude(vR, vI, samples); /* Compute magnitudes */
   // Serial.println("Computed magnitudes:");
   // PrintVector(vR, (samples >> 1), SCL_FREQUENCY);
   fft_data_t output;
